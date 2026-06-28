@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>摄像赏析课作品集 · Evie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ebebeb;
+    --panel:#f5f5f5;
+    --ink:#121212;
+    --ink-soft:#6b6b6b;
+    --line:#d4d4d4;
+    --accent:#121212;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter', -apple-system, Helvetica, Arial, sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    font-weight:400;
+  }
+  a{color:inherit; text-decoration:none;}
+
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:28px 6vw;
+    background:rgba(235,235,235,0.82);
+    backdrop-filter:blur(12px);
+  }
+  .logo{ font-size:15px; font-weight:600; letter-spacing:0.5px; }
+  nav ul{ display:flex; gap:42px; list-style:none; }
+  nav a{
+    font-size:12.5px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--ink-soft); position:relative; padding-bottom:4px; font-weight:500;
+  }
+  nav a::after{
+    content:""; position:absolute; left:0; bottom:0; width:0; height:1px;
+    background:var(--ink); transition:width .35s cubic-bezier(.22,1,.36,1);
+  }
+  nav a:hover{color:var(--ink);}
+  nav a:hover::after{width:100%;}
+
+  .hero{
+    min-height:100vh; display:flex; flex-direction:column; justify-content:center;
+    padding:0 6vw; position:relative;
+  }
+  .hero-tag{
+    font-family:'DM Mono', monospace; font-size:12px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--ink-soft); margin-bottom:28px; opacity:0;
+  }
+  .hero h1{
+    font-size:clamp(44px, 8.4vw, 118px); font-weight:600; line-height:0.98;
+    letter-spacing:-2px; max-width:20ch; opacity:0;
+  }
+  .hero h1 span{color:var(--ink-soft); font-weight:300;}
+  .hero-meta{ margin-top:48px; display:flex; gap:64px; flex-wrap:wrap; opacity:0; max-width:640px; }
+  .hero-meta div{font-size:14px; color:var(--ink-soft); max-width:280px;}
+  .hero-meta b{
+    display:block; font-size:12px; letter-spacing:1px; text-transform:uppercase;
+    color:var(--ink); margin-bottom:6px; font-weight:600;
+  }
+  .scroll-hint{
+    position:absolute; left:6vw; bottom:48px;
+    font-family:'DM Mono', monospace; font-size:11px; letter-spacing:2px;
+    color:var(--ink-soft); opacity:0; display:flex; align-items:center; gap:10px;
+  }
+  .scroll-hint .ln{width:1px; height:38px; background:var(--ink-soft); display:block;
+    animation:pulse 2.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.25;}50%{opacity:.9;}}
+
+  .reveal{
+    opacity:0; transform:translateY(26px);
+    transition:opacity .8s cubic-bezier(.22,1,.36,1), transform .8s cubic-bezier(.22,1,.36,1);
+  }
+  .reveal.in{opacity:1; transform:translateY(0);}
+
+  section.category{ padding:140px 6vw 40px; border-top:1px solid var(--line); position:relative; }
+  .cat-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:60px; gap:24px; flex-wrap:wrap; }
+  .cat-head .index{
+    font-family:'DM Mono', monospace; font-size:12.5px; color:var(--ink-soft);
+    letter-spacing:2px; margin-bottom:10px; display:block;
+  }
+  .cat-title{ font-size:clamp(34px,5vw,56px); font-weight:600; letter-spacing:-1px; }
+  .cat-sub{ font-size:13.5px; color:var(--ink-soft); max-width:300px; text-align:right; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:28px; }
+  .card{ cursor:pointer; position:relative; }
+  /* 图片揭幕动画：clip-path 擦除式入场 + 悬停效果，合并在一条transition里避免互相覆盖 */
+  .card .frame{
+    aspect-ratio:4/3; overflow:hidden; background:#dddddd; position:relative;
+    clip-path:inset(0 0 100% 0);
+    transition:clip-path 1.05s cubic-bezier(.16,1,.3,1), transform .5s cubic-bezier(.22,1,.36,1), box-shadow .5s ease;
+  }
+  .card.in .frame{ clip-path:inset(0 0 0% 0); }
+  .card:hover .frame{transform:scale(1.03); box-shadow:0 22px 44px -18px rgba(0,0,0,0.28);}
+  .card .frame img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    transform:scale(1.18);
+    transition:transform 1.05s cubic-bezier(.16,1,.3,1);
+  }
+  .card.in .frame img{ transform:scale(1); }
+  .card:hover .frame img{transform:scale(1.07);}
+  .card .meta-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-top:14px; }
+  .card .num{
+    flex:0 0 auto;
+    font-family:'DM Mono', monospace; font-size:11.5px; color:var(--ink-soft); letter-spacing:1px;
+    padding-top:2px;
+  }
+  .card .caption{
+    flex:1; font-family:'DM Mono', monospace; font-size:15px; font-weight:400;
+    color:var(--ink); line-height:1.6; letter-spacing:.1px;
+    outline:none; cursor:text; min-height:1.4em;
+    border-bottom:1px solid transparent; transition:border-color .25s ease;
+  }
+  .card .caption:hover, .card .caption:focus{ border-bottom-color:var(--line); }
+  .card .caption:empty::before{
+    content:'点击写一点介绍…'; color:var(--ink-soft); opacity:.6; font-style:italic;
+  }
+
+  .card.add-card{ display:flex; align-items:center; justify-content:center; }
+  .add-card .frame{
+    width:100%; display:flex; align-items:center; justify-content:center;
+    background:transparent; border:1px dashed var(--line);
+  }
+  .add-card .plus{ font-size:30px; font-weight:300; color:var(--ink-soft); line-height:1; }
+  .add-card .add-label{ font-size:11.5px; color:var(--ink-soft); margin-top:10px; text-align:center; letter-spacing:.5px; }
+  .add-card:hover .frame{border-color:var(--ink); box-shadow:none; transform:none;}
+  .add-card:hover .plus, .add-card:hover .add-label{color:var(--ink);}
+
+  .card .del{
+    position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:50%;
+    background:rgba(18,18,18,0.78); color:#ebebeb; display:flex; align-items:center; justify-content:center;
+    font-size:15px; opacity:0.85; transition:opacity .2s ease, transform .2s ease;
+    z-index:10;
+  }
+  .card .del:hover{opacity:1; transform:scale(1.1);}
+  input[type=file]{display:none;}
+
+  footer{
+    padding:80px 6vw 50px; margin-top:60px; border-top:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap;
+  }
+  footer .f-left{font-family:'DM Mono', monospace; font-size:11.5px; color:var(--ink-soft); letter-spacing:.5px;}
+  footer .f-right{font-size:12.5px; color:var(--ink-soft); text-align:right;}
+
+  .lightbox{
+    position:fixed; inset:0; background:rgba(10,10,10,0.96);
+    display:flex; align-items:center; justify-content:center;
+    z-index:1000; opacity:0; visibility:hidden; transition:opacity .45s cubic-bezier(.22,1,.36,1);
+  }
+  .lightbox.open{opacity:1; visibility:visible;}
+  .lightbox img{
+    max-width:82vw; max-height:74vh; object-fit:contain;
+    box-shadow:0 30px 80px rgba(0,0,0,0.5);
+    transform:scale(.97); opacity:0;
+    transition:transform .5s cubic-bezier(.22,1,.36,1), opacity .4s ease;
+  }
+  .lightbox.open img{transform:scale(1); opacity:1;}
+  .lightbox .cap{
+    position:absolute; bottom:6.5vh; left:8vw; right:8vw; text-align:center;
+    color:#dcdcdc; font-family:'DM Mono', monospace; font-size:14.5px; line-height:1.6;
+    opacity:0; transition:opacity .4s ease .1s;
+  }
+  .lightbox.open .cap{opacity:1;}
+  .lightbox .cap .lb-num{
+    display:block; font-family:'DM Mono', monospace; font-size:11px; letter-spacing:1.5px;
+    color:#8a8a8a; margin-bottom:6px;
+  }
+  .lightbox .close{ position:absolute; top:30px; right:5vw; color:#e9e9e9; font-size:26px; cursor:pointer; font-weight:300; }
+  .lightbox .arrow{
+    position:absolute; top:50%; transform:translateY(-50%); color:#e9e9e9; font-size:28px;
+    cursor:pointer; padding:14px; opacity:.55; transition:opacity .2s; font-weight:300;
+  }
+  .lightbox .arrow:hover{opacity:1;}
+  .arrow.prev{left:2vw;} .arrow.next{right:2vw;}
+
+  @media (max-width:760px){
+    nav ul{display:none;}
+    .cat-head{flex-direction:column; align-items:flex-start;}
+    .cat-sub{text-align:left;}
+  }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important; animation:none !important;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Evie</div>
+  <nav>
+    <ul>
+      <li><a href="#landscape">风光</a></li>
+      <li><a href="#architecture">建筑</a></li>
+      <li><a href="#portrait">人物</a></li>
+      <li><a href="#still">静物</a></li>
+      <li><a href="#about">关于</a></li>
+    </ul>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-tag reveal">PHOTOGRAPHY — 2026 SPRING</div>
+  <h1 class="reveal">摄像赏析课<br><span>作品集</span></h1>
+  <div class="hero-meta reveal">
+    <div><b>关于本展</b>风光、建筑、人物、静物，四组主题下的观察与记录，本学期摄影课结课作品。</div>
+    <div><b>策展 / 拍摄</b>Evie</div>
+  </div>
+  <div class="scroll-hint"><span class="ln"></span>SCROLL</div>
+</section>
+
+<section class="category" id="landscape" data-cat="landscape">
+  <div class="cat-head reveal">
+    <div>
+      <span class="index">01 — LANDSCAPE</span>
+      <div class="cat-title">风光</div>
+    </div>
+    <div class="cat-sub">关于光线、地形与时间流动的记录。</div>
+  </div>
+  <div class="grid" id="grid-landscape"></div>
+</section>
+
+<section class="category" id="architecture" data-cat="architecture">
+  <div class="cat-head reveal">
+    <div>
+      <span class="index">02 — ARCHITECTURE</span>
+      <div class="cat-title">建筑</div>
+    </div>
+    <div class="cat-sub">线条、结构与空间秩序的几何观察。</div>
+  </div>
+  <div class="grid" id="grid-architecture"></div>
+</section>
+
+<section class="category" id="portrait" data-cat="portrait">
+  <div class="cat-head reveal">
+    <div>
+      <span class="index">03 — PORTRAIT</span>
+      <div class="cat-title">人物</div>
+    </div>
+    <div class="cat-sub">表情、姿态与瞬间情绪的捕捉。</div>
+  </div>
+  <div class="grid" id="grid-portrait"></div>
+</section>
+
+<section class="category" id="still" data-cat="still">
+  <div class="cat-head reveal">
+    <div>
+      <span class="index">04 — STILL LIFE</span>
+      <div class="cat-title">静物</div>
+    </div>
+    <div class="cat-sub">日常物件的质感、光影与构成练习。</div>
+  </div>
+  <div class="grid" id="grid-still"></div>
+</section>
+
+<footer id="about">
+  <div class="f-left">© 2026 EVIE — PHOTOGRAPHY COURSE FINAL PROJECT</div>
+  <div class="f-right">摄像赏析课 · 结课作品展示<br>素材会自动保存在本机浏览器中</div>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <div class="close" id="lbClose">&times;</div>
+  <div class="arrow prev" id="lbPrev">&#8249;</div>
+  <img id="lbImg" src="" alt="">
+  <div class="cap" id="lbCap"></div>
+  <div class="arrow next" id="lbNext">&#8250;</div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" multiple>
+
+<script>
+const seed = {
+  landscape: [],
+  architecture: [],
+  portrait: [],
+  still: []
+};
+
+const STORAGE_KEY = 'evie_photo_works_v3';
+let works = loadWorks();
+
+function loadWorks(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ console.warn('读取存档失败', e); }
+  return JSON.parse(JSON.stringify(seed));
+}
+function saveWorks(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(works));
+  }catch(e){
+    alert('保存失败：浏览器存储空间不足。建议压缩图片或删除部分旧照片后重试。');
+  }
+}
+
+const categories = ['landscape','architecture','portrait','still'];
+let activeUploadCat = null;
+
+function render(){
+  categories.forEach(cat=>{
+    const grid = document.getElementById('grid-'+cat);
+    grid.innerHTML = '';
+    (works[cat]||[]).forEach((item, idx)=>{
+      const card = document.createElement('div');
+      card.className = 'card reveal';
+      card.style.transitionDelay = (idx % 6) * 70 + 'ms';
+      card.innerHTML = `
+        <div class="del" data-cat="${cat}" data-idx="${idx}" title="删除">&times;</div>
+        <div class="frame" style="transition-delay:${(idx % 6) * 70}ms"><img src="${item.src}" alt="" loading="lazy" style="transition-delay:${(idx % 6) * 70}ms"></div>
+        <div class="meta-row">
+          <span class="num">${String(idx+1).padStart(2,'0')}</span>
+          <div class="caption" contenteditable="true" data-cat="${cat}" data-idx="${idx}">${item.caption ? escapeHtml(item.caption) : ''}</div>
+        </div>`;
+      card.querySelector('.frame').addEventListener('click', ()=> openLightbox(cat, idx));
+      card.querySelector('.del').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        if(confirm('删除这张作品吗？')){
+          works[cat].splice(idx,1);
+          saveWorks(); render();
+        }
+      });
+      const cap = card.querySelector('.caption');
+      cap.addEventListener('click', (e)=> e.stopPropagation());
+      cap.addEventListener('blur', ()=>{
+        works[cat][idx].caption = cap.textContent.trim();
+        saveWorks();
+      });
+      cap.addEventListener('keydown', (e)=>{
+        if(e.key==='Enter'){ e.preventDefault(); cap.blur(); }
+      });
+      grid.appendChild(card);
+    });
+
+    const addCard = document.createElement('div');
+    addCard.className = 'card add-card reveal';
+    addCard.innerHTML = `<div class="frame"><div style="display:flex;flex-direction:column;align-items:center;">
+        <span class="plus">+</span><span class="add-label">添加照片</span></div></div>`;
+    addCard.addEventListener('click', ()=>{
+      activeUploadCat = cat;
+      document.getElementById('fileInput').click();
+    });
+    grid.appendChild(addCard);
+  });
+  observeReveals();
+}
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+document.getElementById('fileInput').addEventListener('change', (e)=>{
+  const files = Array.from(e.target.files || []);
+  if(!files.length || !activeUploadCat) return;
+  let remaining = files.length;
+  files.forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      works[activeUploadCat].push({ src: reader.result });
+      remaining--;
+      if(remaining===0){ saveWorks(); render(); }
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+});
+
+function observeReveals(){
+  const els = document.querySelectorAll('.reveal:not(.in)');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        en.target.classList.add('in');
+        io.unobserve(en.target);
+      }
+    });
+  }, { threshold:0.12 });
+  els.forEach(el=>io.observe(el));
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.hero .reveal, .scroll-hint').forEach((el,i)=>{
+    setTimeout(()=>{ el.style.opacity=1; el.classList.add('in'); }, 200 + i*180);
+  });
+  render();
+});
+
+const lb = document.getElementById('lightbox');
+const lbImg = document.getElementById('lbImg');
+const lbCap = document.getElementById('lbCap');
+let lbCat = null, lbIdx = 0;
+
+function openLightbox(cat, idx){
+  lbCat = cat; lbIdx = idx;
+  updateLightbox();
+  lb.classList.add('open');
+}
+function updateLightbox(animate){
+  const item = works[lbCat][lbIdx];
+  const setContent = ()=>{
+    lbImg.src = item.src;
+    lbImg.style.opacity = '';
+    lbImg.style.transform = '';
+    const cap = item.caption ? item.caption : '';
+    lbCap.innerHTML = `<span class="lb-num">${String(lbIdx+1).padStart(2,'0')} / ${String(works[lbCat].length).padStart(2,'0')}</span>${escapeHtml(cap)}`;
+  };
+  if(animate){
+    lbImg.style.opacity = 0;
+    lbImg.style.transform = 'scale(.97)';
+    setTimeout(()=>{ setContent(); }, 160);
+  } else {
+    setContent();
+  }
+}
+document.getElementById('lbClose').addEventListener('click', ()=> lb.classList.remove('open'));
+lb.addEventListener('click', (e)=>{ if(e.target===lb) lb.classList.remove('open'); });
+document.getElementById('lbPrev').addEventListener('click', ()=>{
+  lbIdx = (lbIdx - 1 + works[lbCat].length) % works[lbCat].length; updateLightbox(true);
+});
+document.getElementById('lbNext').addEventListener('click', ()=>{
+  lbIdx = (lbIdx + 1) % works[lbCat].length; updateLightbox(true);
+});
+document.addEventListener('keydown', (e)=>{
+  if(!lb.classList.contains('open')) return;
+  if(e.key==='Escape') lb.classList.remove('open');
+  if(e.key==='ArrowLeft') document.getElementById('lbPrev').click();
+  if(e.key==='ArrowRight') document.getElementById('lbNext').click();
+});
+</script>
+</body>
+</html>
